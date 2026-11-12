@@ -1,0 +1,32 @@
+name: Render Video
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Unzip project
+      run: unzip body-facts-video.zip -d extracted-project
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install Dependencies & Render
+      working-directory: ./extracted-project
+      run: |
+        npm install
+        npm run build  # Yahan apni project ki render command daal sakte hain
+
+    - name: Upload Video Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rendered-video
+        path: extracted-project/out/*.mp4  # Yahan apni output video ka path dein
