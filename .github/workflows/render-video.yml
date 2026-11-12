@@ -12,21 +12,26 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Unzip project
-      run: unzip body-facts-video.zip -d extracted-project
+      run: |
+        mkdir extracted-project
+        unzip body-facts-video.zip -d extracted-project
+        ls -R extracted-project
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 18
 
-    - name: Install Dependencies & Render
-      working-directory: ./extracted-project
+    - name: Install & Render
       run: |
+        PKG_DIR=$(find extracted-project -name "package.json" -exec dirname {} \; | head -n 1)
+        echo "Found project in: $PKG_DIR"
+        cd "$PKG_DIR"
         npm install
-        npm run build  # Yahan apni project ki render command daal sakte hain
+        npm run build
 
     - name: Upload Video Artifact
       uses: actions/upload-artifact@v4
       with:
         name: rendered-video
-        path: extracted-project/out/*.mp4  # Yahan apni output video ka path dein
+        path: extracted-project/**/out/*.mp4
